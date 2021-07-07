@@ -1,3 +1,5 @@
+const ClientError = require("../../exceptions/ClientError");
+
 class NoteHandler {
     constructor(service, validator) {
         this._service = service
@@ -8,6 +10,26 @@ class NoteHandler {
         this.getNoteByIdHandler = this.getNoteByIdHandler.bind(this);
         this.putNoteByIdHandler = this.putNoteByIdHandler.bind(this);
         this.deleteNoteByIdHandler = this.deleteNoteByIdHandler.bind(this);
+    }
+
+    errorHandler(error, h) {
+        if (error instanceof ClientError) {
+            const response = h.response({
+                status: 'fail',
+                message: error.message
+            })
+            // console.log(response)
+            response.code(error.statusCode)
+            return response
+        }
+
+        // Server ERROR!
+        const response = h.response({
+            status: 'fail',
+            message: 'Maaf, terjadi kegagalan pada server kami.'
+        })
+        response.code(500)
+        return response
     }
     
     postNoteHandler(request, h) {
@@ -25,12 +47,7 @@ class NoteHandler {
             response.code(201)
             return response
         } catch ( error) {
-            const response = h.response({
-                status: 'fail',
-                message: error.message
-            })
-            response.code(400)
-            return response
+            return this.errorHandler(error, h)
         }
     }
     
@@ -55,12 +72,7 @@ class NoteHandler {
                 },
             };
         } catch (error) {
-            const response = h.response({
-                status: 'fail',
-                message: error.message,
-            });
-            response.code(404);
-            return response;
+            return this.errorHandler(error, h)
         }
     }
     
@@ -76,12 +88,7 @@ class NoteHandler {
                 message: 'Catatan berhasil diperbarui',
             };
         } catch (error) {
-            const response = h.response({
-                status: 'fail',
-                message: error.message,
-            });
-            response.code(404);
-            return response;
+            return this.errorHandler(error, h)
         }
     }
     deleteNoteByIdHandler(request, h) {
@@ -93,12 +100,7 @@ class NoteHandler {
                 message: 'Catatan berhasil dihapus',
             };
         } catch (error) {
-            const response = h.response({
-                status: 'fail',
-                message: 'Catatan gagal dihapus. Id tidak ditemukan',
-            });
-            response.code(404);
-            return response;
+            return this.errorHandler(error, h)
         }
     }
 }
