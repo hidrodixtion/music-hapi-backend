@@ -2,7 +2,7 @@ const Hapi = require('@hapi/hapi');
 require('dotenv').config()
 // const routes = require('./routes');
 const notes = require('./api/notes')
-const NoteService = require('./services/inMemory/noteService');
+const NoteService = require('./services/postgres/NotesService');
 const NotesValidator = require('./validator/notes')
 
 const init = async () => {
