@@ -1,6 +1,5 @@
 const Hapi = require('@hapi/hapi');
 require('dotenv').config()
-// const routes = require('./routes');
 const notes = require('./api/songs')
 const SongsService = require('./services/postgres/SongsService');
 const SongsValidator = require('./validator/songs')
@@ -16,8 +15,6 @@ const init = async () => {
       },
     },
   });
-
-  // server.route(routes);
 
   await server.register({
     plugin: notes,
