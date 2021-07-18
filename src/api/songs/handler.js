@@ -1,15 +1,15 @@
 const ClientError = require("../../exceptions/ClientError");
 
-class NoteHandler {
+class SongHandler {
     constructor(service, validator) {
         this._service = service
         this._validator = validator
         
-        this.postNoteHandler = this.postNoteHandler.bind(this);
-        this.getNotesHandler = this.getNotesHandler.bind(this);
-        this.getNoteByIdHandler = this.getNoteByIdHandler.bind(this);
-        this.putNoteByIdHandler = this.putNoteByIdHandler.bind(this);
-        this.deleteNoteByIdHandler = this.deleteNoteByIdHandler.bind(this);
+        this.postSongHandler = this.postSongHandler.bind(this);
+        this.getSongsHandler = this.getSongsHandler.bind(this);
+        this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
+        this.putSongByIdHandler = this.putSongByIdHandler.bind(this);
+        this.deleteSongByIdHandler = this.deleteSongByIdHandler.bind(this);
     }
 
     errorHandler(error, h) {
@@ -32,16 +32,16 @@ class NoteHandler {
         return response
     }
     
-    async postNoteHandler(request, h) {
+    async postSongHandler(request, h) {
         try {
-            this._validator.validateNotePayload(request.payload)
-            const { title = 'untitled', body, tags } = request.payload;
-            const noteId = await this._service.addNote({title, body, tags})
+            this._validator.validateSongPayload(request.payload)
+            const { title = 'untitled', year, performer, genre, duration } = request.payload;
+            const songId = await this._service.addSong({title, year, performer, genre, duration})
             const response = h.response({
                 status: 'success',
-                message: 'Catatan berhasil ditambahkan',
+                message: 'Lagu berhasil ditambahkan',
                 data: {
-                    noteId
+                    songId
                 }
             })
             response.code(201)
@@ -51,24 +51,24 @@ class NoteHandler {
         }
     }
     
-    async getNotesHandler(request, h) {
-        const notes = await this._service.getNotes();
+    async getSongsHandler(request, h) {
+        const songs = await this._service.getSongs();
         return {
             status: 'success',
             data: {
-                notes,
+                songs,
             },
         };
     }
     
-    async getNoteByIdHandler(request, h) {
+    async getSongByIdHandler(request, h) {
         try {
             const { id } = request.params;
-            const note = await this._service.getNoteById(id);
+            const song = await this._service.getSongById(id);
             return {
                 status: 'success',
                 data: {
-                    note,
+                    song,
                 },
             };
         } catch (error) {
@@ -76,29 +76,29 @@ class NoteHandler {
         }
     }
     
-    async putNoteByIdHandler(request, h) {
+    async putSongByIdHandler(request, h) {
         try {
-            this._validator.validateNotePayload(request.payload)
+            this._validator.validateSongPayload(request.payload)
             const { id } = request.params;
             
-            await this._service.editNoteById(id, request.payload);
+            await this._service.editSongById(id, request.payload);
             
             return {
                 status: 'success',
-                message: 'Catatan berhasil diperbarui',
+                message: 'Lagu berhasil diperbarui',
             };
         } catch (error) {
             return this.errorHandler(error, h)
         }
     }
     
-    async deleteNoteByIdHandler(request, h) {
+    async deleteSongByIdHandler(request, h) {
         try {
             const { id } = request.params;
-            await this._service.deleteNoteById(id);
+            await this._service.deleteSongById(id);
             return {
                 status: 'success',
-                message: 'Catatan berhasil dihapus',
+                message: 'Lagu berhasil dihapus',
             };
         } catch (error) {
             return this.errorHandler(error, h)
@@ -106,4 +106,4 @@ class NoteHandler {
     }
 }
 
-module.exports = NoteHandler
+module.exports = SongHandler
